@@ -1,0 +1,11 @@
+{
+  "firstName": "Sergey",
+  "lastName": "Tolkachev",
+  "address": "EKB",
+  "metroStation": "1",
+  "phone": "+7 922 22 222 22",
+  "rentTime": 2,
+  "deliveryDate": "2023-06-06",
+  "comment": "Sprint_7",
+  "color": ["BLACK"]
+}
