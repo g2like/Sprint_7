@@ -10,9 +10,10 @@ public class CourierCredentials {
         this.password = password;
     }
 
-    public static CourierCredentials from(CourierData courier){
+    public static CourierCredentials from(CourierData courier) {
         return new CourierCredentials(courier.getLogin(), courier.getPassword());
     }
+
     public CourierCredentials() {
     }
 
@@ -31,8 +32,6 @@ public class CourierCredentials {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 
 
 }

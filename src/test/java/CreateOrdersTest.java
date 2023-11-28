@@ -8,17 +8,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
+import steps.OrderSteps;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
 
 @RunWith(Parameterized.class)
 public class CreateOrdersTest {
     CourierClient courierClient;
     OrderDate orderDate;
-    private String[] testArray;
-    private int trackOrder;
+    protected String[] colorArray;
+    public int trackOrder;
     ValidatableResponse response;
     private final String firstName;
     private final String lastName;
@@ -30,7 +29,7 @@ public class CreateOrdersTest {
     private final String comment;
     private final List<String> color;
 
-    public CreateOrdersTest(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color){
+    public CreateOrdersTest(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -49,54 +48,38 @@ public class CreateOrdersTest {
 
     @Parameterized.Parameters
     public static Object[][] dateOrder() {
-        return new Object[][]{{"Sergey","Tolkachev","EKB","2","8922222222",2,"2023","Serg",List.of("BLACK")},
-                {"Sergey","Tolkachev","EKB","2","8922222222",3,"2024","Serg",List.of("BLACK","GREY")},
-                {"Sergey","Tolkachev","EKB","2","8922222222",4,"2025","Serg",List.of("")}};
+        return new Object[][]{{"Sergey", "Tolkachev", "EKB", "2", "8922222222", 2, "2023", "Serg", List.of("BLACK")},
+                {"Sergey", "Tolkachev", "EKB", "2", "8922222222", 3, "2024", "Serg", List.of("BLACK", "GREY")},
+                {"Sergey", "Tolkachev", "EKB", "2", "8922222222", 4, "2025", "Serg", List.of("")}};
     }
 
 
-        @Test
-        @DisplayName("Check create orders when different data and check status code")
-        @Description("Create different orders")
-        public void createOrderTest () {
-            convertListToArrayString();
-            createDataOrder();
-            createOrder();
-            getTrackNumber();
-            checkStatusCode();
-            checkBody();
-        }
+    @Test
+    @DisplayName("Check create orders when different data and check status code")
+    @Description("Create different orders")
+    public void createOrderTest() {
+        convertListToArrayString();
+        createDataOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, colorArray);
+        response = courierClient.createOrder(orderDate);
+        getTrackNumber();
+        OrderSteps.checkStatusCode(response);
+        OrderSteps.checkBody(response, trackOrder);
+    }
 
+    @Step("Convert list to string array")
+    public void convertListToArrayString() {
+        colorArray = color.toArray(new String[0]);
+    }
 
-        @Step("Convert list to string array")
-        public void convertListToArrayString(){
-            testArray = color.toArray(new String[0]);
-        }
+    @Step("Create data order")
+    public void createDataOrder(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, String[] colorArray) {
+        orderDate = new OrderDate(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, colorArray);
+    }
 
-        @Step("Create data order")
-        public void createDataOrder(){
-            orderDate = new OrderDate(firstName,lastName,address,metroStation,phone,rentTime,deliveryDate,comment,testArray);
-        }
+    @Step("get track number for compare with body")
+    public void getTrackNumber() {
+        trackOrder = response.extract().body().path("track");
+    }
 
-        @Step("Create order")
-        public ValidatableResponse createOrder(){
-            response = courierClient.createOrder(orderDate);
-            return  response;
-        }
-
-        @Step("get track number for compare with body")
-        public void getTrackNumber(){
-            trackOrder = response.extract().body().path("track");
-        }
-
-        @Step("Check status code")
-        public void checkStatusCode(){
-            response.assertThat().statusCode(201);
-        }
-
-        @Step("Check body")
-        public void checkBody(){
-            response.body("track",is(trackOrder));
-        }
 }
 

@@ -6,17 +6,14 @@ import data.CourierGenerator;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import order.ordersCourier;
+import order.OrdersCourier;
 import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import path.Path;
-
 import java.io.File;
-
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
@@ -29,11 +26,10 @@ public class GetListOfOrdersTest extends RestClient implements Path {
     private int numberTrack;
     private int orderId;
     File orderJson;
-    ordersCourier ordersCourier;
+    OrdersCourier ordersCourier;
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
         orderJson = new File("src/test/resources/order.json");
         courierClient = new CourierClient();
         courier = CourierGenerator.getRandomCourier();
@@ -41,14 +37,14 @@ public class GetListOfOrdersTest extends RestClient implements Path {
     }
 
     @After
-    public void deleteDate(){
+    public void deleteDate() {
         response = courierClient.deleteCourier(courierId);
     }
 
     @Test
     @DisplayName("Get list of orders and check body")
     @Description("Check body when get list of orders")
-    public void GetListOfOrdersTest(){
+    public void GetListOfOrdersTest() {
         loginCourierAndGet();
         createOrderAndGetTrack();
         getOrder();
@@ -59,16 +55,16 @@ public class GetListOfOrdersTest extends RestClient implements Path {
     }
 
     @Step("Login courier and get courier ID")
-    public void loginCourierAndGet(){
+    public void loginCourierAndGet() {
         response = courierClient.loginCourier(CourierCredentials.from(courier));
         courierId = response.extract().body().path("id");
-        System.out.println("CourierId: " + courierId);
     }
 
     @Step("Create order and get track number for next get order ID")
     public void createOrderAndGetTrack() {
         response =
                 given()
+                        .spec(requestSpecification())
                         .header("Content-type", "application/json")
                         .and()
                         .body(orderJson)
@@ -77,37 +73,35 @@ public class GetListOfOrdersTest extends RestClient implements Path {
                         .then();
 
         numberTrack = response.extract().body().path("track");
-        System.out.println("Number track: " + numberTrack);
     }
 
     @Step("Get order and order ID")
-    public void getOrder(){
+    public void getOrder() {
         response = courierClient.getOrder(numberTrack);
         orderId = response.extract().body().path("order.id");
-        System.out.println("orderID: " + orderId);
     }
 
     @Step("Accept order for get list of orders couriers")
-    public void acceptOrder(){
-        response = courierClient.acceptOrder(orderId,courierId);
+    public void acceptOrder() {
+        response = courierClient.acceptOrder(orderId, courierId);
     }
 
     @Step("Get list of orders")
-    public void getListOrder(){
+    public void getListOrder() {
         response = courierClient.getListOrder(courierId);
     }
 
     @Step("Record json date to java object with deserialization")
-    public void getDate(){
+    public void getDate() {
         ordersCourier = given()
                 .spec(requestSpecification())
                 .get(GET_LIST_ORDER_PATH + courierId)
-                .body().as(ordersCourier.class);
+                .body().as(OrdersCourier.class);
     }
 
     @Step("Check body after deserialization")
-    public void checkBody(){
-        MatcherAssert.assertThat(ordersCourier,notNullValue());
+    public void checkBody() {
+        MatcherAssert.assertThat(ordersCourier, notNullValue());
     }
 
 }

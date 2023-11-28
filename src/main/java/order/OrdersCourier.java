@@ -2,7 +2,7 @@ package order;
 
 import java.util.List;
 
-public class ordersCourier {
+public class OrdersCourier {
 
     private List<Orders> orders;
 

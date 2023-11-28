@@ -2,6 +2,7 @@ package client;
 
 import data.CourierCredentials;
 import data.CourierData;
+import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import order.OrderDate;
 import path.Path;
@@ -10,7 +11,8 @@ import static io.restassured.RestAssured.given;
 
 public class CourierClient extends RestClient implements Path {
 
-    public ValidatableResponse createCourier(CourierData courier){
+    @Step("Create courier")
+    public ValidatableResponse createCourier(CourierData courier) {
         return given()
                 .spec(requestSpecification())
                 .and()
@@ -19,7 +21,9 @@ public class CourierClient extends RestClient implements Path {
                 .post(COURIER_PATH)
                 .then();
     }
-    public ValidatableResponse loginCourier(CourierCredentials courierCredentials){
+
+    @Step("Login courier")
+    public ValidatableResponse loginCourier(CourierCredentials courierCredentials) {
         return given()
                 .spec(requestSpecification())
                 .and()
@@ -29,7 +33,8 @@ public class CourierClient extends RestClient implements Path {
                 .then();
     }
 
-    public ValidatableResponse deleteCourier(int id){
+    @Step("Delete courier")
+    public ValidatableResponse deleteCourier(int id) {
         return given()
                 .spec(requestSpecification())
                 .and()
@@ -38,7 +43,8 @@ public class CourierClient extends RestClient implements Path {
                 .then();
     }
 
-    public ValidatableResponse createOrder(OrderDate orderDate){
+    @Step("Create order")
+    public ValidatableResponse createOrder(OrderDate orderDate) {
         return given()
                 .spec(requestSpecification())
                 .and()
@@ -48,16 +54,18 @@ public class CourierClient extends RestClient implements Path {
                 .then();
     }
 
-    public ValidatableResponse acceptOrder(int orderId,int courierId){
+    @Step("Accept order")
+    public ValidatableResponse acceptOrder(int orderId, int courierId) {
         return given()
                 .spec(requestSpecification())
                 .and()
                 .when()
-                .put("api/v1/orders/accept/" + orderId + "?courierId="+ courierId)
+                .put("api/v1/orders/accept/" + orderId + "?courierId=" + courierId)
                 .then();
     }
 
-    public ValidatableResponse getOrder(int track){
+    @Step("Get order")
+    public ValidatableResponse getOrder(int track) {
         return given()
                 .spec(requestSpecification())
                 .and()
@@ -66,7 +74,8 @@ public class CourierClient extends RestClient implements Path {
                 .then();
     }
 
-    public ValidatableResponse getListOrder(int courierId){
+    @Step("Get list of orders")
+    public ValidatableResponse getListOrder(int courierId) {
         return given()
                 .spec(requestSpecification())
                 .and()
